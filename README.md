@@ -1,4 +1,4 @@
-# ytgrab
+# yoinkr
 
 Paste a YouTube link, pick a resolution (best to worst) or grab audio only, and download.
 
@@ -46,10 +46,10 @@ rm cookies.raw.txt
 **2. Build & test the image locally:**
 
 ```bash
-docker build -t ytgrab .
+docker build -t yoinkr .
 docker run --rm -p 3000:3000 \
   -e YTDLP_COOKIES_B64="$(base64 < cookies.txt | tr -d '\n')" \
-  ytgrab
+  yoinkr
 ```
 
 Open http://localhost:3000 — this is the exact image that ships to production, so anything broken here is broken there too.

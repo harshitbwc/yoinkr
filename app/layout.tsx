@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ytgrab",
+  title: "yoinkr",
   description: "Download YouTube videos and audio in the quality you want.",
 };
 

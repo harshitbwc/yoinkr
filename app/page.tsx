@@ -180,7 +180,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center px-4 py-16 sm:py-24">
       <div className="w-full max-w-xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-center">ytgrab</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-center">yoinkr</h1>
         <p className="mt-2 text-center text-sm text-black/60 dark:text-white/60">
           Paste a YouTube link, pick a quality, download.
         </p>

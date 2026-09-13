@@ -61,7 +61,7 @@ export async function startJob(opts: {
   height?: string;
 }): Promise<DownloadJob> {
   const bin = await ytDlpPath();
-  const dir = await mkdtemp(path.join(tmpdir(), "ytgrab-"));
+  const dir = await mkdtemp(path.join(tmpdir(), "yoinkr-"));
   const outTemplate = path.join(dir, "%(title).150B [%(id)s].%(ext)s");
 
   // A stalled TCP connection to YouTube can otherwise hang yt-dlp forever
