@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 
 const CANDIDATE_PATHS = [
   "yt-dlp",
@@ -16,6 +17,17 @@ let resolvedPath: string | null = null;
 export function cookieArgs(): string[] {
   const cookiesFile = process.env.YTDLP_COOKIES_FILE;
   if (cookiesFile) return ["--cookies", cookiesFile];
+
+  // /.dockerenv only exists inside a container — there's no Safari to read
+  // there, so trying anyway just wastes time and masks a missing secret
+  // as a confusing YouTube bot-check failure instead.
+  if (existsSync("/.dockerenv")) {
+    console.warn(
+      "[cookieArgs] Running in a container with no YTDLP_COOKIES_FILE set — proceeding with no cookies at all."
+    );
+    return [];
+  }
+
   return ["--cookies-from-browser", "safari"];
 }
 
