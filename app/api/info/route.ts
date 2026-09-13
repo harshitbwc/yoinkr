@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookieArgs, isValidYoutubeUrl, ytDlp } from "@/lib/ytdlp";
+import { cookieArgs, extractorArgs, isValidYoutubeUrl, ytDlp } from "@/lib/ytdlp";
 
 export const runtime = "nodejs";
 
@@ -50,7 +50,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { stdout } = await ytDlp(["-j", "--no-playlist", "--no-warnings", ...cookieArgs(), url]);
+    const { stdout } = await ytDlp([
+      "-j",
+      "--no-playlist",
+      "--no-warnings",
+      ...cookieArgs(),
+      ...extractorArgs(),
+      url,
+    ]);
     const info: YtDlpInfo = JSON.parse(stdout);
     const formats = info.formats ?? [];
 

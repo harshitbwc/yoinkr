@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { cookieArgs, ytDlpPath } from "@/lib/ytdlp";
+import { cookieArgs, extractorArgs, ytDlpPath } from "@/lib/ytdlp";
 
 export type JobStatus = "running" | "done" | "error" | "cancelled";
 
@@ -79,6 +79,7 @@ export async function startJob(opts: {
           "--newline",
           ...reliabilityArgs,
           ...cookieArgs(),
+          ...extractorArgs(),
           "-o", outTemplate,
           opts.url,
         ]
@@ -91,6 +92,7 @@ export async function startJob(opts: {
           "--newline",
           ...reliabilityArgs,
           ...cookieArgs(),
+          ...extractorArgs(),
           "-o", outTemplate,
           opts.url,
         ];
