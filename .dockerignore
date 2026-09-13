@@ -1,0 +1,6 @@
+node_modules
+.next
+.git
+dev.log
+cookies.txt
+.env*

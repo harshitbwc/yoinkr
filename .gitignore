@@ -29,9 +29,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+dev.log
 
 # env files (can opt-in for committing if needed)
 .env*
+
+# yt-dlp session cookies — as sensitive as a login session, never commit
+cookies.txt
 
 # vercel
 .vercel
