@@ -33,11 +33,15 @@ export function cookieArgs(): string[] {
 
 // A datacenter IP (any hosted platform) gets YouTube's stricter bot-check
 // far more often than a home IP; the android/tv player clients historically
-// dodge that check better than the default web client (same trick as
-// clippooor's modal/app.py). Only worth the tradeoff — those clients can
-// expose fewer/lower-bitrate formats — when actually running from a
-// container, so local dev keeps the full resolution list.
+// dodge that check better than the default web client when there's no real
+// account behind the session (same trick as clippooor's modal/app.py). But
+// they conflict with an actual signed-in cookie file — confirmed: forcing
+// android/tv on top of a real account session throws "The page needs to be
+// reloaded", while the default web client with the same cookies works fine.
+// So only reach for android/tv as the anonymous-cookie fallback, never
+// alongside a real cookies file.
 export function extractorArgs(): string[] {
+  if (process.env.YTDLP_COOKIES_FILE) return [];
   if (existsSync("/.dockerenv")) {
     return ["--extractor-args", "youtube:player_client=android,tv"];
   }
