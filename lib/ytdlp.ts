@@ -65,8 +65,16 @@ function runRaw(bin: string, args: string[]): Promise<{ stdout: string; stderr: 
     child.stderr.on("data", (chunk) => (stderr += chunk));
     child.on("error", reject);
     child.on("close", (code) => {
-      if (code === 0) resolve({ stdout, stderr });
-      else reject(new Error(stderr.trim().split("\n").pop() || `yt-dlp exited with code ${code}`));
+      if (code === 0) return resolve({ stdout, stderr });
+      // Normally just the last line, for a clean user-facing error. With
+      // YTDLP_VERBOSE=1, keep the whole thing — that's the only way to see
+      // the [pot]/PO-token debug lines for a request that fails outright,
+      // since there's no live log panel on this (non-job) code path.
+      const message =
+        process.env.YTDLP_VERBOSE === "1"
+          ? stderr.trim() || `yt-dlp exited with code ${code}`
+          : stderr.trim().split("\n").pop() || `yt-dlp exited with code ${code}`;
+      reject(new Error(message));
     });
   });
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookieArgs, extractorArgs, isValidYoutubeUrl, ytDlp } from "@/lib/ytdlp";
+import { cookieArgs, extractorArgs, isValidYoutubeUrl, verboseArgs, ytDlp } from "@/lib/ytdlp";
 
 export const runtime = "nodejs";
 
@@ -21,6 +21,9 @@ interface YtDlpInfo {
 }
 
 function cleanErrorMessage(message: string): string {
+  // In verbose diagnostic mode, keep the whole thing (the [pot] debug lines
+  // are what we're actually after) — otherwise trim to a clean one-liner.
+  if (process.env.YTDLP_VERBOSE === "1") return message.trim().slice(0, 8000);
   return message.trim().replace(/^ERROR:\s*/, "").slice(0, 300);
 }
 
@@ -56,6 +59,7 @@ export async function POST(req: NextRequest) {
       "--no-warnings",
       ...cookieArgs(),
       ...extractorArgs(),
+      ...verboseArgs(),
       url,
     ]);
     const info: YtDlpInfo = JSON.parse(stdout);
