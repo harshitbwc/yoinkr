@@ -48,6 +48,14 @@ export function extractorArgs(): string[] {
   return [];
 }
 
+// Toggle with the YTDLP_VERBOSE=1 platform env var (no redeploy needed) to
+// see yt-dlp's detailed PO-token debug lines in the job's live log panel —
+// normal output doesn't show whether the PO provider was actually reached
+// or a token was actually generated/used, only the final pass/fail.
+export function verboseArgs(): string[] {
+  return process.env.YTDLP_VERBOSE === "1" ? ["-v"] : [];
+}
+
 function runRaw(bin: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
     const child = spawn(bin, args);
