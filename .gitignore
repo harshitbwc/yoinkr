@@ -37,6 +37,9 @@ dev.log
 # yt-dlp session cookies — as sensitive as a login session, never commit
 cookies.txt
 
+# local waitlist signups (real data on the server, not in the repo)
+waitlist.csv
+
 # vercel
 .vercel
 

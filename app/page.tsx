@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 interface Resolution {
@@ -93,6 +94,58 @@ function AdSlot({ label }: { label: string }) {
       <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border text-xs text-muted sm:h-28">
         {label}
       </div>
+    </div>
+  );
+}
+
+function AppWaitlistForm({ compact = false }: { compact?: boolean }) {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "submitting" | "done" | "error">("idle");
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setState("submitting");
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      setState(res.ok ? "done" : "error");
+    } catch {
+      setState("error");
+    }
+  }
+
+  if (state === "done") {
+    return (
+      <p className={`font-medium text-accent ${compact ? "text-sm" : ""}`}>
+        You&apos;re on the list — we&apos;ll email you when it&apos;s ready.
+      </p>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-sm">
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none placeholder:text-muted focus:border-foreground/40"
+        />
+        <button
+          type="submit"
+          disabled={state === "submitting"}
+          className="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-bold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+        >
+          {state === "submitting" ? "…" : "Notify me"}
+        </button>
+      </form>
+      {state === "error" && <p className="mt-2 text-xs text-accent">Something went wrong — try again.</p>}
     </div>
   );
 }
@@ -264,6 +317,9 @@ export default function Home() {
             <a href="#how-it-works" className="hover:text-foreground">
               How it works
             </a>
+            <a href="#app" className="hover:text-foreground">
+              Get the app
+            </a>
             <a href="#faq" className="hover:text-foreground">
               FAQ
             </a>
@@ -409,6 +465,15 @@ export default function Home() {
                           job.logs.map((line, i) => <div key={i}>{line}</div>)
                         )}
                       </div>
+
+                      {job.status === "done" && (
+                        <p className="mt-3 text-sm text-muted">
+                          Downloads feel slow?{" "}
+                          <a href="#app" className="font-medium text-accent underline underline-offset-2">
+                            The app runs on your machine — instant, no waiting →
+                          </a>
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -433,6 +498,35 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Get the app */}
+        <section id="app" className="relative overflow-hidden border-b border-border bg-foreground text-background">
+          <div
+            className="dot-grid pointer-events-none absolute inset-0"
+            style={{ backgroundImage: "radial-gradient(var(--background) 1px, transparent 1px)" }}
+          />
+          <div className="relative mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-20">
+            <span className="rounded-full border border-background/20 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-background/60">
+              Coming soon
+            </span>
+            <h2 className="mt-5 text-2xl font-black tracking-tight sm:text-3xl">yoinkr, but on your machine.</h2>
+            <p className="mx-auto mt-3 max-w-md text-background/70">
+              The desktop app runs locally — your own connection, no shared server, no queue.
+              Faster and more reliable, especially for big files and 4K.
+            </p>
+            <ul className="mx-auto mt-6 flex max-w-lg flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-background/80">
+              <li>Instant downloads, no server wait</li>
+              <li>Batch &amp; playlist downloads</li>
+              <li>Works even when the web version has a bad day</li>
+            </ul>
+            <div className="mt-8 flex justify-center">
+              <AppWaitlistForm />
+            </div>
+            <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-background/50">
+              One-time purchase or a small subscription — pricing TBD
+            </p>
           </div>
         </section>
 
@@ -470,6 +564,14 @@ export default function Home() {
             <Logo small />
             <p className="mt-1 text-xs text-muted">Not affiliated with YouTube or Google.</p>
           </div>
+          <nav className="flex items-center gap-4 font-mono text-xs uppercase tracking-widest text-muted">
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground">
+              Terms
+            </Link>
+          </nav>
           <p className="font-mono text-xs text-muted">© {new Date().getFullYear()} yoinkr</p>
         </div>
       </footer>
