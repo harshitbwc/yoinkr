@@ -27,49 +27,58 @@ Open [http://localhost:3000](http://localhost:3000), paste a YouTube URL, click 
 
 This app has no database, auth, or queue. It runs fine locally against your own machine, and can also run as a single always-on container (see **Deploying** below) — but the in-memory job map means it must stay a **single instance**; horizontal scaling would break the live log stream / file download for any job that lands on a different instance than the one that started it.
 
-## Deploying
+## Production deployment
 
-This needs a persistent server that can install system binaries and run long-lived processes — not a serverless platform (Vercel functions, etc. — no yt-dlp/ffmpeg, and execution time limits kill anything past a minute or so). A single-instance container platform (Fly.io, Railway, Render) or a plain VPS works.
+**Live at https://yoinkr.online**, running on an Oracle Cloud "Always Free" VM (`VM.Standard.E2.1.Micro`, 1 OCPU / 1GB RAM, Ubuntu 20.04, Mumbai region) — free forever, no time limit. This needs a persistent server that can install system binaries and run long-lived processes, so it's not deployable to a serverless platform (Vercel, etc. — no yt-dlp/ffmpeg, and execution time limits kill anything past a minute).
 
-**1. Export a cookies file once, locally, then filter it down** (there's no Safari on a server, and without *some* signed-in session YouTube's bot-check will block most requests):
+**Server layout:**
+- SSH: `ssh -i ~/.ssh/oracle-yoinkr ubuntu@161.118.163.47`
+- App: Docker container named `yoinkr`, `--restart=always`, bound to `127.0.0.1:3000` only (not directly internet-facing)
+- Reverse proxy: Nginx on 80/443 (`/etc/nginx/sites-available/yoinkr`), `proxy_buffering off` so the live download-log SSE stream isn't delayed
+- TLS: Let's Encrypt via Certbot (installed via `snap`, **not** `apt` — the apt-packaged certbot on this old Ubuntu conflicts with the newer `urllib3` yt-dlp needs). Auto-renews via certbot's own systemd timer; cert covers `yoinkr.online` + `www.yoinkr.online`
+- DNS: Hostinger, A record for `@` → `161.118.163.47`, `www` is a CNAME to the root domain
+- Firewall: opened in **two** places, both required — Oracle's cloud Security List (Console → VCN → Security Lists) *and* the VM's own `iptables` (persisted via `iptables-persistent`/`netfilter-persistent`) for ports 80/443
+- Cookies: `/home/ubuntu/cookies.txt` on the VM, bind-mounted **writable** (not read-only) into the container at `/app/cookies.txt` — yt-dlp writes back to it to persist Google's rotating session tokens, which reduces (but doesn't eliminate) how often you need to manually refresh it
+- Swap: a 4GB swap file (`/swapfile`) — the 1GB VM cannot *build* the Docker image without it (the Next.js production build alone briefly used over 1GB); runtime memory use is much lower (~200-400MB) and doesn't need it
+
+**Redeploying after a code change:**
 
 ```bash
+# from your local yoinkr/ directory
+rsync -az --exclude=node_modules --exclude=.next --exclude=.git --exclude=dev.log --exclude=cookies.txt \
+  -e "ssh -i ~/.ssh/oracle-yoinkr" ./ ubuntu@161.118.163.47:/home/ubuntu/yoinkr/
+
+ssh -i ~/.ssh/oracle-yoinkr ubuntu@161.118.163.47 '
+  cd ~/yoinkr && sudo docker build -t yoinkr:local .
+  sudo docker rm -f yoinkr
+  sudo docker run -d --name yoinkr --restart=always \
+    -p 127.0.0.1:3000:3000 \
+    -v /home/ubuntu/cookies.txt:/app/cookies.txt \
+    -e YTDLP_COOKIES_FILE=/app/cookies.txt \
+    yoinkr:local
+'
+```
+
+The build alone can take several minutes on this VM's single shared core — worth running detached (`nohup ... & disown`) over SSH and polling, rather than holding one connection open, since long-lived SSH sessions to this VM have dropped mid-build before.
+
+**Refreshing cookies** (needed whenever downloads start failing with "Sign in to confirm you're not a bot" — the YouTube login session expires periodically):
+
+```bash
+# locally, with the target account signed into youtube.com in Safari (check for the avatar, not a "Sign in" button)
+cd ~/Documents/pda/yoinkr
 yt-dlp --cookies-from-browser safari --cookies cookies.raw.txt --skip-download "https://www.youtube.com/watch?v=jNQXAC9IVRw"
 awk -F'\t' '/^#/ || $1 ~ /(google|youtube)\.com$/' cookies.raw.txt > cookies.txt
 rm cookies.raw.txt
+scp -i ~/.ssh/oracle-yoinkr cookies.txt ubuntu@161.118.163.47:/home/ubuntu/cookies.txt
+rm cookies.txt
 ```
 
-`--cookies-from-browser` exports your *entire* Safari cookie jar, not just YouTube's — every site you're logged into (Amazon, GitHub, Slack, whatever else) ends up in there too. The `awk` filter keeps only `*.google.com`/`*.youtube.com` lines. Only upload the **filtered** `cookies.txt`, never the raw export, and never commit it. Cookies expire, so repeat this occasionally (e.g. if downloads start failing with "Sign in to confirm you're not a bot" again) and re-upload per step 3.
+No container restart needed — the file is read fresh on each request. Sanity-check a fresh export actually carries a real login before sending it: `awk -F'\t' '$1 ~ /youtube\.com$/ {print $6}' cookies.txt | grep -x LOGIN_INFO`.
 
-**On what these cookies actually are:** `.google.com` and `.youtube.com` are different cookie domains — a Google login (Gmail/Docs/Calendar) doesn't automatically carry over to youtube.com itself. Unless you've explicitly signed into *youtube.com*, what's actually in this file is YouTube's anonymous visitor/consent cookies (`VISITOR_INFO1_LIVE`, `YSC`, `PREF`, `SOCS`, etc.), not a specific logged-in account — check by opening youtube.com in the same browser: an avatar top-right means an account is genuinely tied to it, a "Sign in" button means it's anonymous-only (verify with `curl`/inspecting cookie names, never by exporting cookies to a script that calls out to Google directly).
-- **Anonymous cookies (no avatar shown):** lower risk to any personal account (nothing YouTube-specific is being authenticated), but a weaker, more fragile signal — more prone to tripping the bot-check under heavy or repeated use, since it's not backed by a real account.
-- **A real account signed into youtube.com (avatar shown):** stronger, more reliable bypass, but now that account carries the risk of a flag/restriction if this server's traffic pattern ever looks abusive — use a secondary/throwaway account for that case, never your primary one.
+**Checking logs:** `ssh -i ~/.ssh/oracle-yoinkr ubuntu@161.118.163.47 'sudo docker logs yoinkr'` — the entrypoint logs whether cookies loaded and whether the PO token provider started; per-request `yt-dlp` output only appears in a job's own SSE stream (the UI's log panel), not here, unless `YTDLP_VERBOSE=1` is set on the container.
 
-**2. Build & test the image locally:**
+**A PO-token provider** (`bgutil-ytdlp-pot-provider`, HTTP server mode) runs alongside the app as a backup path for when cookies alone aren't enough — YouTube increasingly requires a BotGuard-solved "Proof of Origin" token from datacenter IPs. Its "script" mode (spawn-per-request instead of a resident server) looked appealing to save memory, but hits a confirmed unresolved upstream bug (hangs on startup regardless of args — [issue #232](https://github.com/Brainicism/bgutil-ytdlp-pot-provider/issues/232)); don't switch back to it without checking if that's since been fixed.
 
-```bash
-docker build -t yoinkr .
-docker run --rm -p 3000:3000 \
-  -e YTDLP_COOKIES_B64="$(base64 < cookies.txt | tr -d '\n')" \
-  yoinkr
-```
+**Housekeeping:** `sudo docker images` / `docker rmi` periodically — superseded image layers from rebuilds pile up (each full image is ~2GB) and this VM's disk, while generous, isn't infinite.
 
-Open http://localhost:3000 — this is the exact image that ships to production, so anything broken here is broken there too.
-
-**3. Deploy to Fly.io** (Railway/Render: same Dockerfile, use their dashboard to connect the repo instead of the CLI):
-
-```bash
-brew install flyctl
-fly auth login          # opens a browser — needs your own Fly account
-fly launch --no-deploy   # detects the Dockerfile, asks for an app name/region — say NO to Postgres/Redis, and NO to autoscaling beyond 1 machine
-fly secrets set YTDLP_COOKIES_B64="$(base64 < cookies.txt | tr -d '\n')"
-fly deploy
-```
-
-`fly launch` writes a `fly.toml` — before deploying, make sure it has exactly one machine and no autoscaling (`[[vm]] ... ` section with `min_machines_running = 1`, no `max_machines_running` beyond 1), since the in-memory job map only works within a single instance.
-
-**4. Verify:** `fly open` (or the URL Fly prints), paste a link, download something. `fly logs` shows the same `yt-dlp` output you'd otherwise see in `dev.log`.
-
-**Ongoing maintenance to expect, since this is now open to anyone:**
-- A datacenter IP gets bot-checked by YouTube more often than a home IP — if downloads start failing, refresh `cookies.txt` (step 1) and re-run step 3's `fly secrets set` + `fly deploy`.
-- No auth and no rate limiting means every visitor's bandwidth and every yt-dlp process runs against your one hosted IP/cookie identity — heavy simultaneous use will look the same to YouTube as one very busy user, which is exactly what triggers bot-checks and quota limits fastest.
+**Ongoing reality of running this publicly, with no auth or rate limiting:** every visitor's bandwidth and every yt-dlp process runs against this one server's IP/cookie identity — heavy simultaneous use looks the same to YouTube as one very busy user, which is exactly what triggers bot-checks fastest. If that becomes a real problem, revisit rate-limiting per IP (discussed, not yet built) before reaching for a bigger/paid instance — this shape already has large headroom for normal light traffic.
