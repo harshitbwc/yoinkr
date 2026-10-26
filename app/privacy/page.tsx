@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — yoinkr",
+  title: "Privacy Policy | yoinkr",
   description: "How yoinkr handles data, cookies, and third-party advertising.",
 };
 
@@ -30,9 +30,9 @@ export default function PrivacyPage() {
           </p>
           <p className="mt-2">
             <strong>Server logs.</strong> Like most web servers, ours automatically logs standard
-            technical information for each request — your IP address, browser user agent, and
-            timestamp — for operating and securing the service. These logs are not linked to any
-            personal identity and are not sold or shared.
+            technical information for each request, including your IP address, browser user
+            agent, and timestamp, used for operating and securing the service. These logs are not
+            linked to any personal identity and are not sold or shared.
           </p>
           <p className="mt-2">
             <strong>Downloaded files.</strong> Videos and audio are fetched on demand for your
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
               href="https://adssettings.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-accent"
+              className="underline underline-offset-2 hover:text-accent-strong"
             >
               Google Ads Settings
             </a>{" "}
@@ -64,17 +64,17 @@ export default function PrivacyPage() {
               href="https://www.aboutads.info/choices"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-accent"
+              className="underline underline-offset-2 hover:text-accent-strong"
             >
               aboutads.info/choices
             </a>
             . Third-party vendors, including Google, may also use cookies to serve ads based on
-            your prior visits to this site or other sites on the internet — see Google&apos;s{" "}
+            your prior visits to this site or other sites on the internet. See Google&apos;s{" "}
             <a
               href="https://policies.google.com/technologies/partner-sites"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-accent"
+              className="underline underline-offset-2 hover:text-accent-strong"
             >
               how Google uses information from sites that use its services
             </a>{" "}
@@ -112,7 +112,7 @@ export default function PrivacyPage() {
           <h2 className="text-base font-bold">Contact</h2>
           <p className="mt-2">
             Questions about this policy? Reach out at{" "}
-            <a href="mailto:hello@yoinkr.online" className="underline underline-offset-2 hover:text-accent">
+            <a href="mailto:hello@yoinkr.online" className="underline underline-offset-2 hover:text-accent-strong">
               hello@yoinkr.online
             </a>
             .

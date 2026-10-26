@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "yoinkr — grab any YouTube video, any quality",
+  title: "yoinkr | Grab any YouTube video, any quality",
   description:
     "Paste a YouTube link, pick a resolution from 4K down to 144p or grab just the audio, and download it. Free, no sign-up, no app to install.",
 };

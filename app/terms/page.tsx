@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — yoinkr",
+  title: "Terms of Service | yoinkr",
   description: "The terms that apply to using yoinkr.",
 };
 
@@ -41,20 +41,20 @@ export default function TermsPage() {
             </li>
             <li>You won&apos;t use the service to infringe anyone&apos;s copyright or other rights.</li>
             <li>
-              You won&apos;t abuse the service — including excessive automated requests, attempts to
+              You won&apos;t abuse the service, including excessive automated requests, attempts to
               disrupt or overload it, or reselling access to it.
             </li>
           </ul>
           <p className="mt-2">
             We don&apos;t review, control, or take responsibility for what URLs are submitted or what
-            they&apos;re used for — that responsibility is yours.
+            they&apos;re used for. That responsibility is yours.
           </p>
         </section>
 
         <section>
           <h2 className="text-base font-bold">Copyright concerns</h2>
           <p className="mt-2">
-            yoinkr doesn&apos;t host, store, or index any video content — it fetches a file on
+            yoinkr doesn&apos;t host, store, or index any video content. It fetches a file on
             demand for the person requesting it, then deletes it from our server. If you&apos;re a
             rights holder with a concern, contact us at the address below and we&apos;ll look into
             it.
@@ -66,7 +66,7 @@ export default function TermsPage() {
           <p className="mt-2">
             The service is provided &quot;as is&quot; and &quot;as available&quot;, without warranties of any
             kind. We don&apos;t guarantee it will always be available, error-free, or that any
-            particular video, resolution, or format will successfully download — YouTube&apos;s own
+            particular video, resolution, or format will successfully download. YouTube&apos;s own
             systems can and do change in ways outside our control.
           </p>
         </section>
@@ -92,7 +92,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-base font-bold">Governing law</h2>
           <p className="mt-2 rounded-lg border border-dashed border-border bg-surface p-3 text-muted">
-            [Add your jurisdiction here — e.g. &quot;these terms are governed by the laws of
+            [Add your jurisdiction here, e.g. &quot;these terms are governed by the laws of
             ___&quot;. Left as a placeholder since this depends on where the business is
             registered.]
           </p>
@@ -102,7 +102,7 @@ export default function TermsPage() {
           <h2 className="text-base font-bold">Contact</h2>
           <p className="mt-2">
             Questions about these terms? Reach out at{" "}
-            <a href="mailto:hello@yoinkr.online" className="underline underline-offset-2 hover:text-accent">
+            <a href="mailto:hello@yoinkr.online" className="underline underline-offset-2 hover:text-accent-strong">
               hello@yoinkr.online
             </a>
             .

@@ -1,15 +1,26 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   /* Warm paper, not sterile white — and a deep warm ink instead of pure black. */
   --background: #faf6ef;
   --surface: #fffdf9;
   --foreground: #1c1815;
-  --muted: #8a8073;
+  /* Darkened from the original #8a8073 so body-sized secondary text clears
+     WCAG AA (4.5:1) on both background and surface, not just large text. */
+  --muted: #756d62;
   --border: #e7ddc9;
+  /* The vibrant brand color, kept for backgrounds, large display headlines
+     (which only need 3:1) and decorative elements. */
   --accent: #ff4e2e;
   --accent-foreground: #fffaf3;
   --accent-soft: #ffe6dc;
+  /* A darker accent for normal/small text sizes (links, labels, errors),
+     where --accent itself falls short of the 4.5:1 AA text threshold. */
+  --accent-strong: #cc3e25;
 }
 
 @theme inline {
@@ -21,6 +32,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-strong: var(--accent-strong);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -28,6 +40,19 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* A consistent, on-brand keyboard focus ring for every interactive element,
+   instead of the browser default (which is inconsistent across browsers and
+   easy to lose track of against a warm off-white background). Only shows for
+   keyboard/AT navigation, never on mouse click, so it doesn't fight the
+   existing hover/active states. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* A faint dot grid instead of a flat void — cheap, no images, reads as
@@ -66,4 +91,34 @@ body {
   height: 1px;
   width: 100%;
   transform: translateY(-50%);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Respect the OS-level motion preference — disable everything animated
+   instead of just shortening it. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

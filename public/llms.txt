@@ -1,0 +1,15 @@
+# yoinkr
+
+> yoinkr is a free web tool for downloading YouTube videos and audio. Paste a YouTube link, choose a resolution (from the video's original quality down to 144p) or extract just the audio as an MP3, and download the file directly in the browser. No account or sign-up is required.
+
+## Pages
+
+- [Home](https://yoinkr.online/): The main tool. Paste a YouTube URL, fetch its available resolutions, and download video or audio.
+- [Privacy Policy](https://yoinkr.online/privacy): How yoinkr handles data, cookies, and advertising.
+- [Terms of Service](https://yoinkr.online/terms): The terms that apply to using the service.
+
+## Notes
+
+- yoinkr does not store downloaded files after they are served to the requesting user.
+- yoinkr is not affiliated with YouTube or Google.
+- A paid desktop app is planned, which will run locally on the user's own machine. There is a waitlist signup on the home page.

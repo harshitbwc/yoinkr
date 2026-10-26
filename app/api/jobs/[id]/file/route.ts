@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const job = getJob(id);
 
   if (!job) {
-    return NextResponse.json({ error: "Job not found — it may have already been downloaded or expired." }, { status: 404 });
+    return NextResponse.json({ error: "Job not found. It may have already been downloaded or expired." }, { status: 404 });
   }
   if (job.status !== "done" || !job.filePath) {
     return NextResponse.json({ error: "This download isn't finished yet." }, { status: 409 });
