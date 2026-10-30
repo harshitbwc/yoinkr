@@ -1,0 +1,45 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#1c1815" opacity="0.06"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#faf6ef" stop-opacity="0"/>
+      <stop offset="1" stop-color="#faf6ef" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#faf6ef"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <!-- icon mark -->
+  <g transform="translate(366,150)">
+    <rect width="130" height="130" rx="30" fill="#ff4e2e"/>
+    <path d="M 35 31 L 65 70 L 95 31" fill="none" stroke="#fffaf3" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 65 70 L 65 104" fill="none" stroke="#fffaf3" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 88 94 L 102 80" stroke="#fffaf3" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+    <path d="M 97 104 L 111 90" stroke="#fffaf3" stroke-width="7" stroke-linecap="round" opacity="0.3"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="520" y="260" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="104" letter-spacing="-3" fill="#1c1815">yoinkr</text>
+
+  <!-- tagline -->
+  <text x="368" y="346" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="34" fill="#4a443c">
+    Paste a YouTube link. Pick a quality. Download.
+  </text>
+
+  <!-- chips -->
+  <g font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="20" letter-spacing="1">
+    <rect x="368" y="384" width="130" height="42" rx="21" fill="none" stroke="#e7ddc9" stroke-width="2"/>
+    <text x="433" y="411" fill="#cc3e25" text-anchor="middle">FREE</text>
+
+    <rect x="510" y="384" width="230" height="42" rx="21" fill="none" stroke="#e7ddc9" stroke-width="2"/>
+    <text x="625" y="411" fill="#1c1815" text-anchor="middle" font-weight="600">NO SIGN-UP</text>
+
+    <rect x="752" y="384" width="190" height="42" rx="21" fill="none" stroke="#e7ddc9" stroke-width="2"/>
+    <text x="847" y="411" fill="#1c1815" text-anchor="middle" font-weight="600">UP TO 4K</text>
+  </g>
+
+  <text x="368" y="560" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="24" letter-spacing="2" fill="#8a8073">YOINKR.ONLINE</text>
+</svg>

@@ -12,10 +12,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "yoinkr | Grab any YouTube video, any quality";
+const description =
+  "Paste a YouTube link, pick a resolution from 4K down to 144p or grab just the audio, and download it. Free, no sign-up, no app to install.";
+
 export const metadata: Metadata = {
-  title: "yoinkr | Grab any YouTube video, any quality",
-  description:
-    "Paste a YouTube link, pick a resolution from 4K down to 144p or grab just the audio, and download it. Free, no sign-up, no app to install.",
+  metadataBase: new URL("https://yoinkr.online"),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    url: "https://yoinkr.online",
+    siteName: "yoinkr",
+    images: [{ url: "/banner.png", width: 1200, height: 630, alt: "yoinkr" }],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/banner.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
